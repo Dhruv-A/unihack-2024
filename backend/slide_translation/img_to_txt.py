@@ -12,13 +12,13 @@ class ImageToText:
         self.api_key = api_key
         with open(self.img_path, "rb") as image_file_descriptor:
             files = {"image": image_file_descriptor}
-        headers = {"X-Api-Key": self.api_key}
-        r = requests.post(self.api_url, files=files, headers=headers)
-        self.api_output = r.json()
+            headers = {"X-Api-Key": self.api_key}
+            r = requests.post(self.api_url, files=files, headers=headers)
+            self.api_output = r.json()
 
     def get_wordlist(self) -> list[str]:
         """Returns a list of all words in the image"""
-        return [w["text"] for w in self.textual_data]
+        return [w["text"] for w in self.api_output]
 
     def get_concat_string(self) -> str:
         """Returns a string containing all words separated by a space"""
@@ -30,7 +30,7 @@ class ImageToText:
         >>> imgtxt.get_api_output() 
         [{'text': str, 'bounding_box': {'x1': int, 'y1': int, 'x2': int, 'y2': int}}, ...]
         """
-        return self.api_output()
+        return self.api_output
 
 
 def main():
@@ -43,8 +43,9 @@ def main():
     image_path = os.path.join(script_dir, '../../sample_images/sample_image1.png')
 
     imgtxt = ImageToText(image_path, api_key)
-    plaintext = imgtxt.get_plaintext()
-    print(plaintext)
+    print(imgtxt.get_wordlist())
+    print(imgtxt.get_concat_string())
+    print(imgtxt.get_api_output())
 
 if __name__ == "__main__":
     main()
