@@ -1,5 +1,6 @@
 import S from './styles';
 import Dropzone from 'react-dropzone'
+import axios from 'axios';
 
 import File from 'assets/upload.svg'
 import { useState, useCallback, useEffect } from 'react';
@@ -13,24 +14,42 @@ export default function Drop() {
   useEffect(() => {
     console.log('Added file', files);
   }, [files])
-  const onDrop = useCallback(
-    (acceptedFiles, fileRejections) => {
-      // If file is valid, add it to app files
-      // If not flag it as rejected
-      if (acceptedFiles?.length) {
-        setFiles((previousFiles) => [...previousFiles, ...acceptedFiles]);
 
+  const onDrop = useCallback(async (acceptedFiles, fileRejections) => {
+    try {
+      if (acceptedFiles?.length) {
+        // Set files state
+        setFiles(previousFiles => [...previousFiles, ...acceptedFiles]);
+        
+        // Handle file upload
+        await handleFileUpload(acceptedFiles[0]); // Assuming only one file is uploaded
       }
 
       if (fileRejections?.length) {
-        setRejectedFiles((previousFiles) => [
-          ...previousFiles,
-          ...fileRejections,
-        ]);
+        // Set rejected files state
+        setRejectedFiles(previousFiles => [...previousFiles, ...fileRejections]);
       }
-    },
-    [],
-  );
+    } catch (error) {
+      console.error(`Error handling file`, error);
+    }
+  }, []);
+
+  const handleFileUpload = async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await axios.post('http://127.0.0.1:5173/translate_slide', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      console.log(response.data);
+    } 
+    catch (error) {
+      console.error(`Error uploading file:`, error);
+    }
+  }
 
   return (
     <Dropzone onDrop={onDrop}>

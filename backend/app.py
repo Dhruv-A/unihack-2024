@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from slide_translation.find_and_replace import FindAndReplace
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Allow CORS for all routes
+
 
 # ensuring there is upload folder
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -36,4 +38,4 @@ def translate_slide():
         return jsonify({'message': 'File translated', 'output_file': output_file_path}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost', port='5173', debug=True)
