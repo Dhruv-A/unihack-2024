@@ -10,6 +10,11 @@ const File = styled.img`
   width: 30%;
 `;
 
+
+const Upload = styled.button`
+  background: #2D261F;
+`;
+
 export default {
   File,
   FileWrapper
