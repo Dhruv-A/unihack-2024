@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^1.6.7",
     "react": "^18.2.0",
+    "react-animated-progress-bar": "^1.1.2",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-router-dom": "^6.22.2",

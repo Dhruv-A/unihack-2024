@@ -14,7 +14,7 @@ class GDriveUploader:
     def __init__(self):
         # OAth2
         SCOPES = ["https://www.googleapis.com/auth/drive"]
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.script_dir = os.path.dirname(os.getcwd() + "/backend")
         creds = None
         token_path = os.path.join(self.script_dir, "token.json")
 

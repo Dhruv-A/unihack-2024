@@ -4,25 +4,22 @@ import axios from 'axios';
 
 import File from 'assets/upload.svg'
 import { useState, useCallback, useEffect } from 'react';
+import Progress from 'components/Progress';
+import Selection from 'components/Selection';
+import UploadedFile from 'components/UploadedFile';
 
-export default function Drop() {
-  const [files, setFiles] = useState([]);
+export default function Drop({files, setFiles}) {
   const [mapFiles, setMapFiles] = useState([]);
   const [rejectedfiles, setRejectedFiles] = useState([]);
 
-
-  useEffect(() => {
-    console.log('Added file', files);
-  }, [files])
+  const [progress, setProgress] = useState(0);
+  const [completed, setCompleted] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles, fileRejections) => {
     try {
       if (acceptedFiles?.length) {
         // Set files state
         setFiles(previousFiles => [...previousFiles, ...acceptedFiles]);
-        
-        // Handle file upload
-        await handleFileUpload(acceptedFiles[0]); // Assuming only one file is uploaded
       }
 
       if (fileRejections?.length) {
@@ -34,36 +31,53 @@ export default function Drop() {
     }
   }, []);
 
-  const handleFileUpload = async (file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const response = await axios.post('http://127.0.0.1:5173/translate_slide', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+  const loadProgress = (size) => {
+    let current = 0;
+    if (progress != 100) {
+      for (let i = 0; i < size; i++) {
+        const result = Math.floor(((i+1)/size) * 100);
+        setProgress(result);
+        if(result == 100) {
+          console.log('HERE!')
+          return result;
         }
-      })
-      console.log(response.data);
-    } 
-    catch (error) {
-      console.error(`Error uploading file:`, error);
+      }
     }
+    setTimeout(function(){
+      setCompleted(true);
+    }, 2500); //delay is in milliseconds 
+    
   }
-
+  
   return (
-    <Dropzone onDrop={onDrop}>
-      {({getRootProps, getInputProps}) => (
-        <section>
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <S.FileWrapper>
-              <S.File src={File}/>
-              <p>Drag and drop a file, or click to select files</p>
-            </S.FileWrapper>
-          </div>
-        </section>
-      )}
-    </Dropzone>
+    <>
+      {files.length <= 0 ? 
+        <Dropzone onDrop={onDrop}>
+          {({getRootProps, getInputProps}) => (
+            <section>
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <S.FileWrapper>
+                  <S.File src={File}/>
+                  <p>Drag and drop a file, or click to select files</p>
+                </S.FileWrapper>
+              </div>
+            </section>
+          )}
+        </Dropzone>
+      :
+        <>
+          {completed == false ? 
+            <>
+              {loadProgress(files[0].size) != 100 ?
+                 <Progress progress={progress} /> : null
+              }
+            </>
+            :
+            <UploadedFile file={files[0]} />
+          }
+        </>
+      }
+    </>
   )
 }
