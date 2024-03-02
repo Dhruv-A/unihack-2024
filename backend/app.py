@@ -1,12 +1,25 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session, redirect, abort
 from werkzeug.utils import secure_filename
+from google_auth_oauthlib.flow import Flow
+from google.oauth2 import id_token
 import os
+import pathlib
 from slide_translation.find_and_replace import FindAndReplace
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Allow CORS for all routes
 
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
+
+GOOGLE_CLIENT_ID = "<Add your own unique Google Client Id from the client_secret.json here>"
+client_secrets_file = os.path.join(pathlib.Path(__file__), "creds.json")
+
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    redirect_uri="http://localhost/callback"
+)
 
 # ensuring there is upload folder
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -36,6 +49,13 @@ def translate_slide():
         slide_translator.replace_text_in_presentation(file_path, find_text, replace_text, output_file_path)
 
         return jsonify({'message': 'File translated', 'output_file': output_file_path}), 200
+
+@app.route('/login')
+def login():
+    pass
+
+
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port='5173', debug=True)
