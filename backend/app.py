@@ -51,10 +51,12 @@ def translate_slide():
         find_text = request.form.get('find_text')
         replace_text = request.form.get('replace_text')
 
+        print("FIND", find_text, "REPLACE", replace_text);
+
         # Process the file
         slide_translator = FindAndReplace()
         output_file_path = f'../sample_presentations/translated_{filename}'
-        slide_translator.replace_text_in_presentation(file_path, find_text, replace_text, output_file_path)
+        slide_translator.replace_text_in_presentation(filename, "DE", file_path)
 
         return jsonify({'message': 'File translated', 'output_file': output_file_path}), 200
 
