@@ -13,3 +13,5 @@ urllib3==2.2.1
 Werkzeug==3.0.1
 XlsxWriter==3.2.0
 zipp==3.17.0
+google-api-python-client==2.120.0
+google-auth-oauthlib==1.2.0
