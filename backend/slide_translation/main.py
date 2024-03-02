@@ -1,4 +1,4 @@
-from find_and_replace import FindAndReplace
+from .find_and_replace import FindAndReplace
 
 if __name__=='__main__':
     slide_translator = FindAndReplace()

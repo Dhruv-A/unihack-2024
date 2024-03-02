@@ -1,6 +1,6 @@
 import os
 from pptx import Presentation
-from translator import Translator
+from .translator import Translator
 
 class FindAndReplace:
     def __init__(self):
