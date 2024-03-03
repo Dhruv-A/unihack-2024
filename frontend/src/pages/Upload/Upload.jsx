@@ -26,7 +26,6 @@ export default function Upload() {
           'Content-Type': 'multipart/form-data'
         }
       }).then((res) => {setLoading(false); setLink(res.data)});
-      console.log(response.data);
     } 
     catch (error) {
       console.error(`Error uploading file:`, error);
@@ -37,7 +36,7 @@ export default function Upload() {
     <S.PageContainer>
       <Navbar />
       {link ? 
-        <Link link={link}/>
+        <Link sharelink={link}/>
         :
         <>
           {loading ?
