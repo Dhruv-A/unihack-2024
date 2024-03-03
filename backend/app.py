@@ -19,8 +19,9 @@ CORS(app)  # Allow CORS for all routes
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
-GOOGLE_CLIENT_ID = "<Add your own unique Google Client Id from the client_secret.json here>"
-client_secrets_file = os.path.join(pathlib.Path(os.getcwd()), "creds.json")
+GOOGLE_CLIENT_ID = "863891304862-jpbrib4enfd5toiqafgk5i7th9b9ucnj.apps.googleusercontent.com"
+SCOPES = ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"]
+client_secrets_file = os.path.join(pathlib.Path(os.getcwd()), "webapp_credentials.json")
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,

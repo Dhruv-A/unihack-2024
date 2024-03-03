@@ -46,6 +46,8 @@ def main():
     print(imgtxt.get_wordlist())
     print(imgtxt.get_concat_string())
     print(imgtxt.get_api_output())
+    print(imgtxt.get_text_dimensions())
+    
 
 if __name__ == "__main__":
     main()
