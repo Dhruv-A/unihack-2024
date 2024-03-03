@@ -11,6 +11,7 @@ from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 from pip._vendor import cachecontrol
 from slide_translation.find_and_replace import FindAndReplace
+from slide_translation.pptx_to_gslides import GDriveUploader
 from flask_cors import CORS
 
 
@@ -44,6 +45,8 @@ def translate_slide():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
+    target_language = request.form['language']
+
     # no filename selected
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -57,14 +60,17 @@ def translate_slide():
         find_text = request.form.get('find_text')
         replace_text = request.form.get('replace_text')
 
-        print("FIND", find_text, "REPLACE", replace_text);
-
         # Process the file
         slide_translator = FindAndReplace()
         output_file_path = f'../sample_presentations/translated_{filename}'
-        slide_translator.replace_text_in_presentation(filename, "DE", file_path)
+        slide_translator.replace_text_in_presentation(filename, target_language, file_path)
 
-        return jsonify({'message': 'File translated', 'output_file': output_file_path}), 200
+        # 
+        # Upload to GDrive
+        gdrive_uploader = GDriveUploader()
+        gdrive_uploader.upload_ppt(f"translated_presentations/{filename}_translated.pptx")
+
+        return jsonify(gdrive_uploader.get_sharable_link())
 
 @app.route('/login')
 def login():

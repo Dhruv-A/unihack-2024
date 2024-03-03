@@ -31,6 +31,9 @@ class ImageToText:
         [{'text': str, 'bounding_box': {'x1': int, 'y1': int, 'x2': int, 'y2': int}}, ...]
         """
         return self.api_output
+    
+    def get_text_dimensions(self):
+        return [d["bounding_box"] for d in self.api_output]
 
 
 def main():
@@ -46,6 +49,8 @@ def main():
     print(imgtxt.get_wordlist())
     print(imgtxt.get_concat_string())
     print(imgtxt.get_api_output())
+    print(imgtxt.get_text_dimensions())
+    
 
 if __name__ == "__main__":
     main()
