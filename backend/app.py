@@ -6,6 +6,7 @@ import google.auth.transport.requests
 import os
 import pathlib
 import requests
+from dotenv import load_dotenv
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 from pip._vendor import cachecontrol
@@ -13,18 +14,24 @@ from slide_translation.find_and_replace import FindAndReplace
 from slide_translation.pptx_to_gslides import GDriveUploader
 from flask_cors import CORS
 
+
 app = Flask(__name__)
-app.secret_key = "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"
 CORS(app)  # Allow CORS for all routes
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(script_dir, "../.env")
+load_dotenv(dotenv_path=env_path)
+WEBAPP_CREDENTIALS_PATH = os.path.join(script_dir, "../webapp_credentials.json")
+SERVICE_CREDENTIALS_PATH = os.path.join(script_dir, "../service_credentials.json")
+app.secret_key = os.getenv("CLIENT_SECRET")
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
-GOOGLE_CLIENT_ID = "863891304862-jpbrib4enfd5toiqafgk5i7th9b9ucnj.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = os.getenv("CLIENT_ID")
 SCOPES = ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"]
-client_secrets_file = os.path.join(pathlib.Path(os.getcwd()), "webapp_credentials.json")
 
 flow = Flow.from_client_secrets_file(
-    client_secrets_file=client_secrets_file,
+    client_secrets_file=WEBAPP_CREDENTIALS_PATH,
     scopes=SCOPES,
     redirect_uri="http://localhost:5173/callback"
 )
@@ -98,7 +105,7 @@ def callback():
 def upload_files():
 
     ppts_uploads_folder = os.path.join(script_dir, "uploads/")
-    credentials_file = os.path.join(script_dir, 'service_credentials.json')
+    credentials_file = SERVICE_CREDENTIALS_PATH
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file, scopes=['https://www.googleapis.com/auth/drive'])
     service = build('drive', 'v3', credentials=credentials)
