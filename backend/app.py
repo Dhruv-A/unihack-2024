@@ -10,7 +10,6 @@ from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 from pip._vendor import cachecontrol
 from slide_translation.find_and_replace import FindAndReplace
-from slide_translation.pptx_to_gslides import GDriveUploader
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -19,8 +18,10 @@ CORS(app)  # Allow CORS for all routes
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
-GOOGLE_CLIENT_ID = "<Add your own unique Google Client Id from the client_secret.json here>"
-client_secrets_file = os.path.join(pathlib.Path(os.getcwd()), "creds.json")
+GOOGLE_CLIENT_ID = "863891304862-jpbrib4enfd5toiqafgk5i7th9b9ucnj.apps.googleusercontent.com"
+SCOPES = ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"]
+script_dir = os.path.dirname(os.path.abspath(__file__))
+client_secrets_file = os.path.join(script_dir, "webapp_credentials.json")
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
@@ -37,8 +38,6 @@ def translate_slide():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
-    target_language = request.form['language']
-
     # no filename selected
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -52,17 +51,14 @@ def translate_slide():
         find_text = request.form.get('find_text')
         replace_text = request.form.get('replace_text')
 
+        print("FIND", find_text, "REPLACE", replace_text);
+
         # Process the file
         slide_translator = FindAndReplace()
         output_file_path = f'../sample_presentations/translated_{filename}'
-        slide_translator.replace_text_in_presentation(filename, target_language, file_path)
+        slide_translator.replace_text_in_presentation(filename, "DE", file_path)
 
-        # 
-        # Upload to GDrive
-        gdrive_uploader = GDriveUploader()
-        gdrive_uploader.upload_ppt(f"translated_presentations/{filename}_translated.pptx")
-
-        return jsonify(gdrive_uploader.get_sharable_link())
+        return jsonify({'message': 'File translated', 'output_file': output_file_path}), 200
 
 @app.route('/login')
 def login():
